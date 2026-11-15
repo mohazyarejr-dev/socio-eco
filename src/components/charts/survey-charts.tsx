@@ -1,11 +1,11 @@
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -125,11 +125,17 @@ export function CategoryBarsChart({ data }: { data: SliceDatum[] }) {
   );
 }
 
-/** Line chart of responses over time (admin dashboard). */
+/** Area chart of responses over time (admin dashboard). */
 export function ResponsesOverTimeChart({ data }: { data: { month: string; responses: number }[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
-      <LineChart data={data} margin={{ top: 8, right: 16, left: -16 }}>
+      <AreaChart data={data} margin={{ top: 16, right: 16, left: -16 }}>
+        <defs>
+          <linearGradient id="responses-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.35} />
+            <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.02} />
+          </linearGradient>
+        </defs>
         <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" />
         <XAxis
           dataKey="month"
@@ -144,15 +150,16 @@ export function ResponsesOverTimeChart({ data }: { data: { month: string; respon
           tickLine={false}
         />
         <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => [`${v}`, "Responses"]} />
-        <Line
+        <Area
           type="monotone"
           dataKey="responses"
           stroke="var(--chart-1)"
           strokeWidth={2.5}
-          dot={{ r: 3.5, fill: "var(--chart-1)" }}
+          fill="url(#responses-fill)"
+          dot={{ r: 3.5, fill: "var(--chart-1)", strokeWidth: 0 }}
           activeDot={{ r: 5 }}
         />
-      </LineChart>
+      </AreaChart>
     </ResponsiveContainer>
   );
 }

@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
@@ -16,13 +17,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
+import { MobileTabBar } from "@/components/site/mobile-tab-bar";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4 py-20">
       <div className="max-w-md text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-teal-deep">
-          Youth Wellbeing Research
+        <p className="text-sm font-semibold text-brand-deep">
+          Youth Health Matters
         </p>
         <h1 className="mt-3 text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
@@ -86,17 +88,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       {
-        title: "Youth Wellbeing Research | Substance Abuse Effects on Youths",
+        title: "Youth Health Matters | Substance Abuse Effects on Youths",
       },
       {
         name: "description",
         content:
           "Independent research platform examining the socio-economic and health-related effects of substance abuse among young people. Anonymous survey, research findings, and prevention resources.",
       },
-      { name: "author", content: "Youth Wellbeing Research" },
+      { name: "author", content: "Youth Health Matters" },
       {
         property: "og:title",
-        content: "Youth Wellbeing Research | Substance Abuse Effects on Youths",
+        content: "Youth Health Matters | Substance Abuse Effects on Youths",
       },
       {
         property: "og:description",
@@ -115,7 +117,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
@@ -144,6 +146,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isAdminArea = pathname === "/admin" || pathname.startsWith("/admin/");
 
   useEffect(() => {
     const {
@@ -159,13 +163,18 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col">
-        <SiteHeader />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <SiteFooter />
-      </div>
+      {isAdminArea ? (
+        <Outlet />
+      ) : (
+        <div className="flex min-h-screen flex-col pb-16 md:pb-0">
+          <SiteHeader />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <SiteFooter />
+          <MobileTabBar />
+        </div>
+      )}
       <Toaster />
     </QueryClientProvider>
   );

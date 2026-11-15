@@ -25,13 +25,13 @@ import {
 export const Route = createFileRoute("/survey")({
   head: () => ({
     meta: [
-      { title: "Anonymous Survey | Youth Wellbeing Research" },
+      { title: "Anonymous Survey | Youth Health Matters" },
       {
         name: "description",
         content:
           "Share your perspective in a completely anonymous survey about the health and socio-economic effects of substance abuse among young people. No name, email, or phone number is ever collected.",
       },
-      { property: "og:title", content: "Anonymous Survey | Youth Wellbeing Research" },
+      { property: "og:title", content: "Anonymous Survey | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -96,14 +96,14 @@ function ChoiceGroup({
             key={option}
             className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm transition-colors ${
               value === option
-                ? "border-teal bg-teal-soft/60 text-foreground"
+                ? "border-brand bg-brand-soft/60 text-foreground"
                 : "border-border/70 bg-card hover:bg-accent"
             }`}
           >
             <input
               type="radio"
               name={name}
-              className="size-4 accent-[var(--teal-deep)]"
+              className="size-4 accent-[var(--brand-deep)]"
               checked={value === option}
               onChange={() => onChange(option)}
             />
@@ -136,7 +136,7 @@ function LikertRow({
             onClick={() => onChange(n)}
             className={`flex h-10 w-10 flex-col items-center justify-center rounded-lg border text-sm font-semibold transition-colors ${
               value === n
-                ? "border-teal-deep bg-teal text-teal-foreground"
+                ? "border-brand-deep bg-brand text-brand-foreground"
                 : "border-border bg-background hover:bg-accent"
             }`}
           >
@@ -176,7 +176,7 @@ function CheckGroup({
             key={option.value}
             className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition-colors ${
               selected.includes(option.value)
-                ? "border-teal bg-teal-soft/60 text-foreground"
+                ? "border-brand bg-brand-soft/60 text-foreground"
                 : "border-border/70 bg-card hover:bg-accent"
             }`}
           >
@@ -282,7 +282,7 @@ function SurveyPage() {
         <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
           <Card className="rounded-2xl border-border/60 shadow-sm">
             <CardContent className="p-8 text-center">
-              <PartyPopper className="mx-auto size-10 text-teal-deep" aria-hidden="true" />
+              <PartyPopper className="mx-auto size-10 text-brand-deep" aria-hidden="true" />
               <p className="mt-4 text-sm text-muted-foreground">Your reference code</p>
               <p className="font-display text-3xl font-semibold text-foreground">
                 {submitState.referenceCode}
@@ -292,7 +292,7 @@ function SurveyPage() {
                 back to you.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+                <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
                   <Link to="/findings">
                     View live findings
                     <ArrowRight className="ml-1 size-4" aria-hidden="true" />
@@ -319,7 +319,7 @@ function SurveyPage() {
         />
         <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
           <div className="flex flex-wrap gap-3">
-            <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+            <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
               <Link to="/findings">View findings</Link>
             </Button>
             <Button asChild variant="outline">
@@ -352,14 +352,14 @@ function SurveyPage() {
               key={label}
               className={`flex items-center gap-2 rounded-full border px-3 py-1.5 ${
                 index === step
-                  ? "border-teal-deep bg-teal-soft text-foreground"
+                  ? "border-brand-deep bg-brand-soft text-foreground"
                   : index < step
-                    ? "border-teal/40 bg-background text-muted-foreground"
+                    ? "border-brand/40 bg-background text-muted-foreground"
                     : "border-border/70 bg-background text-muted-foreground/70"
               }`}
             >
               {index < step ? (
-                <CheckCircle2 className="size-3.5 text-teal-deep" aria-hidden="true" />
+                <CheckCircle2 className="size-3.5 text-brand-deep" aria-hidden="true" />
               ) : (
                 <span className="tabular-nums">{index + 1}</span>
               )}
@@ -492,7 +492,7 @@ function SurveyPage() {
                     {suggestions.length}/2000
                   </p>
                 </div>
-                <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-teal/40 bg-teal-soft/50 p-4 text-sm">
+                <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-brand/40 bg-brand-soft/50 p-4 text-sm">
                   <Checkbox
                     checked={consent}
                     onCheckedChange={(v) => setConsent(v === true)}
@@ -500,14 +500,14 @@ function SurveyPage() {
                   />
                   <span>
                     I have read the{" "}
-                    <Link to="/privacy" className="font-semibold text-teal-deep underline underline-offset-4">
+                    <Link to="/privacy" className="font-semibold text-brand-deep underline underline-offset-4">
                       privacy notice
                     </Link>{" "}
                     and I consent to my anonymous answers being used for this research.
                   </span>
                 </label>
                 <div className="mt-6 flex items-start gap-3 rounded-2xl border border-border/60 bg-secondary/50 p-4">
-                  <ClipboardCheck className="mt-0.5 size-5 shrink-0 text-teal-deep" aria-hidden="true" />
+                  <ClipboardCheck className="mt-0.5 size-5 shrink-0 text-brand-deep" aria-hidden="true" />
                   <p className="text-sm leading-relaxed text-foreground/90">
                     Ready to submit? Your answers are sent once, stored anonymously, and cannot
                     be edited afterwards. Review your answers by going back through the steps.
@@ -534,7 +534,7 @@ function SurveyPage() {
                 Back
               </Button>
               {step < STEPS.length - 1 ? (
-                <Button onClick={next} className="bg-teal text-teal-foreground hover:bg-teal-deep">
+                <Button onClick={next} className="bg-brand text-brand-foreground hover:bg-brand-deep">
                   Continue
                   <ArrowRight className="ml-1 size-4" aria-hidden="true" />
                 </Button>
@@ -542,7 +542,7 @@ function SurveyPage() {
                 <Button
                   onClick={handleSubmit}
                   disabled={submitState.status === "submitting"}
-                  className="bg-teal text-teal-foreground shadow-lg shadow-teal-deep/30 hover:bg-teal-deep"
+                  className="bg-brand text-brand-foreground shadow-lg shadow-brand-deep/30 hover:bg-brand-deep"
                 >
                   {submitState.status === "submitting" ? "Submitting…" : "Submit anonymously"}
                   <CheckCircle2 className="ml-1 size-4" aria-hidden="true" />
@@ -554,11 +554,11 @@ function SurveyPage() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Questions about the research? Read the{" "}
-          <Link to="/about" className="font-semibold text-teal-deep underline underline-offset-4">
+          <Link to="/about" className="font-semibold text-brand-deep underline underline-offset-4">
             study background
           </Link>{" "}
           or the{" "}
-          <Link to="/privacy" className="font-semibold text-teal-deep underline underline-offset-4">
+          <Link to="/privacy" className="font-semibold text-brand-deep underline underline-offset-4">
             privacy notice
           </Link>
           .

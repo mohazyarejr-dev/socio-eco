@@ -20,14 +20,14 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       {
-        title: "About the Research | Youth Wellbeing Research",
+        title: "About the Research | Youth Health Matters",
       },
       {
         name: "description",
         content:
           "Background, problem statement, objectives, research questions, and significance of the study on the socio-economic and health-related effects of substance abuse among youths.",
       },
-      { property: "og:title", content: "About the Research | Youth Wellbeing Research" },
+      { property: "og:title", content: "About the Research | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -55,7 +55,7 @@ function AboutPage() {
             <Card className="rounded-2xl border-border/60 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                  <Lightbulb className="size-5 text-teal-deep" aria-hidden="true" />
+                  <Lightbulb className="size-5 text-brand-deep" aria-hidden="true" />
                   Background
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -67,7 +67,7 @@ function AboutPage() {
             <Card className="rounded-2xl border-border/60 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                  <HelpCircle className="size-5 text-teal-deep" aria-hidden="true" />
+                  <HelpCircle className="size-5 text-brand-deep" aria-hidden="true" />
                   Problem statement
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -76,10 +76,10 @@ function AboutPage() {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-teal/30 bg-teal-soft/40 shadow-sm">
+            <Card className="rounded-2xl border-brand/30 bg-brand-soft/40 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                  <Target className="size-5 text-teal-deep" aria-hidden="true" />
+                  <Target className="size-5 text-brand-deep" aria-hidden="true" />
                   Main objective
                 </h2>
                 <p className="mt-3 text-sm font-medium leading-relaxed text-foreground">
@@ -94,7 +94,7 @@ function AboutPage() {
                 <ul className="mt-4 space-y-2.5">
                   {specificObjectives.map((o) => (
                     <li key={o} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-teal-deep" aria-hidden="true" />
+                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-deep" aria-hidden="true" />
                       {o}
                     </li>
                   ))}
@@ -108,7 +108,7 @@ function AboutPage() {
                 <ol className="mt-4 space-y-2.5">
                   {researchQuestions.map((q, i) => (
                     <li key={q} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
-                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-teal-soft text-xs font-bold text-teal-deep">
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xs font-bold text-brand-deep">
                         {i + 1}
                       </span>
                       {q}
@@ -130,19 +130,19 @@ function AboutPage() {
                 <h2 className="font-display text-xl font-semibold">Methodology in brief</h2>
                 <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted-foreground">
                   <li className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-teal-deep" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-deep" aria-hidden="true" />
                     Anonymous structured questionnaire for respondents aged 18 and above
                   </li>
                   <li className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-teal-deep" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-deep" aria-hidden="true" />
                     Closed Likert-scale items plus optional open-text suggestions
                   </li>
                   <li className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-teal-deep" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-deep" aria-hidden="true" />
                     Aggregate-only reporting; no individual responses are published
                   </li>
                   <li className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-teal-deep" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand-deep" aria-hidden="true" />
                     Voluntary participation with withdrawal at any point before submission
                   </li>
                 </ul>
@@ -165,21 +165,21 @@ function AboutPage() {
                 <ul className="mt-3 space-y-2 text-sm leading-relaxed text-muted-foreground">
                   {researchLimitations.map((l) => (
                     <li key={l} className="flex gap-2">
-                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal-deep" />
+                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-deep" />
                       {l}
                     </li>
                   ))}
                 </ul>
               </CardContent>
             </Card>
-            <Card className="rounded-2xl border-teal/30 bg-teal-soft/40 shadow-sm">
+            <Card className="rounded-2xl border-brand/30 bg-brand-soft/40 shadow-sm">
               <CardContent className="p-6">
                 <h2 className="font-display text-lg font-semibold">Take part</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                   The survey is anonymous and takes 5–7 minutes. Your responses directly
                   shape the findings.
                 </p>
-                <Button asChild className="mt-4 bg-teal text-teal-foreground hover:bg-teal-deep">
+                <Button asChild className="mt-4 bg-brand text-brand-foreground hover:bg-brand-deep">
                   <Link to="/survey">
                     Take the Survey
                     <ArrowRight className="ml-1 size-4" aria-hidden="true" />

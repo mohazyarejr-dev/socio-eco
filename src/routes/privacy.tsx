@@ -8,13 +8,13 @@ import { researchLimitations } from "@/lib/research-content";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy & Research Ethics | Youth Wellbeing Research" },
+      { title: "Privacy & Research Ethics | Youth Health Matters" },
       {
         name: "description",
         content:
           "Privacy policy, consent information, data retention, and research limitations for the anonymous youth substance-abuse survey.",
       },
-      { property: "og:title", content: "Privacy & Research Ethics | Youth Wellbeing Research" },
+      { property: "og:title", content: "Privacy & Research Ethics | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -53,16 +53,16 @@ function PrivacyPage() {
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="rounded-2xl border-teal/30 bg-teal-soft/40 shadow-sm">
+          <Card className="rounded-2xl border-brand/30 bg-brand-soft/40 shadow-sm">
             <CardContent className="p-6">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                <CheckCircle2 className="size-5 text-teal-deep" aria-hidden="true" />
+                <CheckCircle2 className="size-5 text-brand-deep" aria-hidden="true" />
                 What we collect
               </h2>
               <ul className="mt-4 space-y-2">
                 {COLLECTED.map((item) => (
                   <li key={item} className="flex gap-2 text-sm leading-relaxed text-foreground/85">
-                    <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal-deep" />
+                    <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-deep" />
                     {item}
                   </li>
                 ))}
@@ -98,7 +98,7 @@ function PrivacyPage() {
           <Card className="rounded-2xl border-border/60 shadow-sm">
             <CardContent className="p-6">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                <RefreshCcw className="size-5 text-teal-deep" aria-hidden="true" />
+                <RefreshCcw className="size-5 text-brand-deep" aria-hidden="true" />
                 Consent, withdrawal, and retention
               </h2>
               <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -127,7 +127,7 @@ function PrivacyPage() {
           <Card className="rounded-2xl border-border/60 shadow-sm">
             <CardContent className="p-6">
               <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-                <ShieldCheck className="size-5 text-teal-deep" aria-hidden="true" />
+                <ShieldCheck className="size-5 text-brand-deep" aria-hidden="true" />
                 Who can see responses
               </h2>
               <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted-foreground">
@@ -154,13 +154,13 @@ function PrivacyPage() {
         <Card className="mt-6 rounded-2xl border-border/60 bg-secondary/50 shadow-sm">
           <CardContent className="p-6">
             <h2 className="flex items-center gap-2 font-display text-xl font-semibold">
-              <FileText className="size-5 text-teal-deep" aria-hidden="true" />
+              <FileText className="size-5 text-brand-deep" aria-hidden="true" />
               Research limitations
             </h2>
             <ul className="mt-4 space-y-2">
               {researchLimitations.map((l) => (
                 <li key={l} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal-deep" />
+                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-deep" />
                   {l}
                 </li>
               ))}
@@ -171,14 +171,14 @@ function PrivacyPage() {
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-secondary/60 p-8">
           <div>
             <h2 className="flex items-center gap-2 font-display text-2xl font-semibold">
-              <Lock className="size-5 text-teal-deep" aria-hidden="true" />
+              <Lock className="size-5 text-brand-deep" aria-hidden="true" />
               Ready to take part?
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
               The consent screen inside the survey repeats all of this before any question.
             </p>
           </div>
-          <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+          <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
             <Link to="/survey">
               Take the Survey
               <ArrowRight className="ml-1 size-4" aria-hidden="true" />

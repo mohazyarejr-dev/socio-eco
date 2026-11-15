@@ -7,13 +7,13 @@ import { references } from "@/lib/research-content";
 export const Route = createFileRoute("/references")({
   head: () => ({
     meta: [
-      { title: "References | Youth Wellbeing Research" },
+      { title: "References | Youth Health Matters" },
       {
         name: "description",
         content:
           "Credible academic and public-health sources informing this research, including WHO and UNODC publications.",
       },
-      { property: "og:title", content: "References | Youth Wellbeing Research" },
+      { property: "og:title", content: "References | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -41,12 +41,12 @@ function ReferencesPage() {
             <Card key={ref.url} className="rounded-2xl border-border/60 shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-start gap-3">
-                  <BookMarked className="mt-1 size-5 shrink-0 text-teal-deep" aria-hidden="true" />
+                  <BookMarked className="mt-1 size-5 shrink-0 text-brand-deep" aria-hidden="true" />
                   <div>
                     <h2 className="font-display text-lg font-semibold text-foreground">
                       {ref.title}
                     </h2>
-                    <p className="text-sm font-medium text-teal-deep">{ref.organization}</p>
+                    <p className="text-sm font-medium text-brand-deep">{ref.organization}</p>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {ref.note}
                     </p>

@@ -8,23 +8,42 @@ import { z } from "zod";
  * data. Row Level Security enforces the same rules at the database.
  */
 
-async function requireAdmin(context: { supabase: Awaited<unknown>; userId: string }) {
-  const { data: isAdmin, error } = await (context.supabase as any).rpc("has_role", {
+type RoleContext = { supabase: Awaited<unknown>; userId: string };
+
+async function hasRole(context: RoleContext, role: "admin" | "moderator") {
+  const { data, error } = await (context.supabase as any).rpc("has_role", {
     _user_id: context.userId,
-    _role: "admin",
+    _role: role,
   });
-  if (error || !isAdmin) throw new Error("Forbidden: administrator access required");
+  return !error && data === true;
+}
+
+/** Full control: manage projects/resources. */
+async function requireAdmin(context: RoleContext) {
+  if (!(await hasRole(context, "admin"))) {
+    throw new Error("Forbidden: administrator access required");
+  }
+}
+
+/** Researchers ("moderator" role) and admins may view and export survey data. */
+async function requireStaff(context: RoleContext) {
+  if ((await hasRole(context, "admin")) || (await hasRole(context, "moderator"))) return;
+  throw new Error("Forbidden: researcher access required");
 }
 
 export const adminCheck = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    try {
-      await requireAdmin(context);
-      return { isAdmin: true as const };
-    } catch {
-      return { isAdmin: false as const };
-    }
+    const isAdmin = await hasRole(context, "admin");
+    const isResearcher = !isAdmin && (await hasRole(context, "moderator"));
+    return {
+      isAdmin,
+      isStaff: isAdmin || isResearcher,
+      role: (isAdmin ? "admin" : isResearcher ? "researcher" : null) as
+        | "admin"
+        | "researcher"
+        | null,
+    };
   });
 
 export interface SurveyRecord {
@@ -51,9 +70,9 @@ export const listSurveyResponses = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ data: SurveyRecord[] | null; error?: string }> => {
     try {
-      await requireAdmin(context);
+      await requireStaff(context);
     } catch {
-      return { data: null, error: "Administrator access required." };
+      return { data: null, error: "Researcher access required." };
     }
     const { data, error } = await (context.supabase as any)
       .from("survey_responses")
@@ -76,9 +95,9 @@ export const exportSurveyCsv = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ csv: string | null; error?: string }> => {
     try {
-      await requireAdmin(context);
+      await requireStaff(context);
     } catch {
-      return { csv: null, error: "Administrator access required." };
+      return { csv: null, error: "Researcher access required." };
     }
     const { data, error } = await (context.supabase as any)
       .from("survey_responses")

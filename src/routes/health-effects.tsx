@@ -9,13 +9,13 @@ import { healthEffectsSections } from "@/lib/research-content";
 export const Route = createFileRoute("/health-effects")({
   head: () => ({
     meta: [
-      { title: "Health Effects | Youth Wellbeing Research" },
+      { title: "Health Effects | Youth Health Matters" },
       {
         name: "description",
         content:
           "How substance abuse affects young people's physical health, mental wellbeing, addiction risk, education, and access to treatment — explained respectfully and without stigma.",
       },
-      { property: "og:title", content: "Health Effects | Youth Wellbeing Research" },
+      { property: "og:title", content: "Health Effects | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -51,7 +51,7 @@ function HealthEffectsPage() {
                 <ul className="mt-4 space-y-2">
                   {section.points.map((point) => (
                     <li key={point} className="flex gap-2 text-sm leading-relaxed text-foreground/85">
-                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal" />
+                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
                       {point}
                     </li>
                   ))}
@@ -61,13 +61,13 @@ function HealthEffectsPage() {
           ))}
         </div>
 
-        <div className="mt-10 flex items-start gap-3 rounded-2xl border border-teal/30 bg-teal-soft/50 p-5">
-          <Info className="mt-0.5 size-5 shrink-0 text-teal-deep" aria-hidden="true" />
+        <div className="mt-10 flex items-start gap-3 rounded-2xl border border-brand/30 bg-brand-soft/50 p-5">
+          <Info className="mt-0.5 size-5 shrink-0 text-brand-deep" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-foreground/90">
             This page is for research and education only — it is not medical advice, and
             it cannot diagnose anything. If you are worried about your own or someone
             else's substance use, speak to a qualified health worker, or visit our{" "}
-            <Link to="/resources" className="font-semibold text-teal-deep underline underline-offset-4">
+            <Link to="/resources" className="font-semibold text-brand-deep underline underline-offset-4">
               support resources
             </Link>
             .
@@ -81,7 +81,7 @@ function HealthEffectsPage() {
               The anonymous survey asks how these effects show up in your community.
             </p>
           </div>
-          <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+          <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
             <Link to="/survey">
               Take the Survey
               <ArrowRight className="ml-1 size-4" aria-hidden="true" />

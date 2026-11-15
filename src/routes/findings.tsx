@@ -17,13 +17,13 @@ import { researchLimitations } from "@/lib/research-content";
 export const Route = createFileRoute("/findings")({
   head: () => ({
     meta: [
-      { title: "Research Findings | Youth Wellbeing Research" },
+      { title: "Research Findings | Youth Health Matters" },
       {
         name: "description",
         content:
           "Aggregate findings from the anonymous youth survey: perceived health and socio-economic impacts, awareness levels, and demographic summaries.",
       },
-      { property: "og:title", content: "Research Findings | Youth Wellbeing Research" },
+      { property: "og:title", content: "Research Findings | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -162,7 +162,7 @@ function FindingsPage() {
         {!isLive ? (
           <SampleBadge label="Sample data — until verified responses reach the reporting threshold" />
         ) : (
-          <p className="text-sm font-medium text-teal">
+          <p className="text-sm font-medium text-brand">
             Live aggregate data · {live!.total_responses} anonymous responses
           </p>
         )}
@@ -182,7 +182,7 @@ function FindingsPage() {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className="flex items-center gap-2 font-display text-2xl font-semibold">
-            <Filter className="size-5 text-teal-deep" aria-hidden="true" />
+            <Filter className="size-5 text-brand-deep" aria-hidden="true" />
             Perceived impact by life domain
           </h2>
           <Tabs value={domain} onValueChange={(v) => setDomain(v as DomainTab)}>
@@ -248,7 +248,7 @@ function FindingsPage() {
                           </span>
                           <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
                             <div
-                              className="h-full rounded-full bg-teal transition-all"
+                              className="h-full rounded-full bg-brand transition-all"
                               style={{ width: `${Math.round((effect.value / max) * 100)}%` }}
                             />
                           </div>
@@ -283,7 +283,7 @@ function FindingsPage() {
               and believe, which is valuable for shaping prevention and support, but
               individual experiences vary widely.
             </p>
-            <Button asChild className="mt-6 bg-teal text-teal-foreground hover:bg-teal-deep">
+            <Button asChild className="mt-6 bg-brand text-brand-foreground hover:bg-brand-deep">
               <Link to="/survey">
                 Add your voice — take the survey
                 <ArrowRight className="ml-1 size-4" aria-hidden="true" />
@@ -295,7 +295,7 @@ function FindingsPage() {
             <ul className="mt-4 space-y-2.5">
               {researchLimitations.map((l) => (
                 <li key={l} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal-deep" />
+                  <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand-deep" />
                   {l}
                 </li>
               ))}
