@@ -1,6 +1,19 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Download, Loader2, ShieldCheck, Trash2 } from "lucide-react";
+import {
+    Download,
+  FileText,
+  Globe,
+  LayoutDashboard,
+  LifeBuoy,
+  Loader2,
+  LogOut,
+  ShieldCheck,
+  Trash2,
+  Users,
+  HeartPulse,
+  Brain,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,7 +29,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,7 +46,14 @@ import {
   type ResearchResource,
   type SurveyRecord,
 } from "@/lib/admin.functions";
-import { AgeDistributionChart, ImpactScoresChart, CategoryBarsChart } from "@/components/charts/survey-charts";
+import {
+  AgeDistributionChart,
+  ImpactScoresChart,
+  CategoryBarsChart,
+  ResponsesOverTimeChart,
+} from "@/components/charts/survey-charts";
+import { BrandMark } from "@/components/site/brand-mark";
+import { supabase } from "@/integrations/supabase/client";
 import { VALUE_LABELS } from "@/lib/survey-schema";
 import { getSurveyAggregates } from "@/lib/survey.functions";
 import { SampleBadge } from "@/components/site/sample-badge";
@@ -48,7 +67,7 @@ export const Route = createFileRoute("/admin")({
   },
   head: () => ({
     meta: [
-      { title: "Research Dashboard | Youth Wellbeing Research" },
+      { title: "Research Dashboard | Youth Health Matters" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -92,46 +111,160 @@ const IMPACT_KEYS = [
   { key: "socioeconomic_finance", label: "Finances" },
 ] as const;
 
+type View = "overview" | "responses" | "projects" | "resources";
+
+const ADMIN_NAV: { id: View; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+  { id: "responses", label: "Survey responses", icon: Users },
+  { id: "projects", label: "Projects", icon: FileText },
+  { id: "resources", label: "Resources", icon: LifeBuoy },
+];
+
 function AdminPage() {
+  const [view, setView] = useState<View>("overview");
+  const navigate = useNavigate();
+  const current = ADMIN_NAV.find((n) => n.id === view)!;
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    await navigate({ to: "/login" });
+  }
+
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-teal-deep">
-            Research team
-          </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold">Research dashboard</h1>
+    <div className="min-h-screen bg-background md:grid md:grid-cols-[17rem_1fr]">
+      {/* Sidebar (tablet and up) */}
+      <aside className="sticky top-0 hidden h-screen flex-col bg-navy-deep p-4 text-white md:flex">
+        <BrandMark className="px-1 pb-6 pt-2" />
+        <nav aria-label="Dashboard sections" className="flex flex-1 flex-col gap-1">
+          {ADMIN_NAV.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setView(id)}
+              aria-current={view === id ? "page" : undefined}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-sky ${
+                view === id
+                  ? "bg-brand text-brand-foreground shadow-md shadow-brand/30"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              <Icon className="size-4.5" aria-hidden="true" />
+              {label}
+            </button>
+          ))}
+        </nav>
+        <div className="space-y-1 border-t border-white/10 pt-3">
+          <Link
+            to="/"
+            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <Globe className="size-4.5" aria-hidden="true" />
+            View public site
+          </Link>
+          <button
+            type="button"
+            onClick={signOut}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <LogOut className="size-4.5" aria-hidden="true" />
+            Sign out
+          </button>
         </div>
-        <SampleBadge label="Live research data" />
+      </aside>
+
+      <div className="min-w-0">
+        {/* Top bar */}
+        <header className="sticky top-0 z-20 border-b border-border bg-card/90 backdrop-blur">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-8">
+            <div className="flex items-center gap-3">
+              <span className="md:hidden">
+                <BrandMark tone="light" compact />
+              </span>
+              <h1 className="hidden text-xl font-extrabold text-navy md:block">{current.label}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:block">
+                <SampleBadge label="Live research data" />
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={signOut}
+                aria-label="Sign out"
+              >
+                <LogOut className="size-4.5" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+          {/* Section switcher (phones) */}
+          <nav
+            aria-label="Dashboard sections"
+            className="flex gap-2 overflow-x-auto px-4 pb-3 md:hidden"
+          >
+            {ADMIN_NAV.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setView(id)}
+                aria-current={view === id ? "page" : undefined}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold ${
+                  view === id ? "bg-brand text-brand-foreground" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        </header>
+
+        <main className="space-y-6 px-4 py-6 sm:px-8">
+          {view === "overview" && <OverviewTab onSeeAll={() => setView("responses")} />}
+          {view === "responses" && <ResponsesTab />}
+          {view === "projects" && <ProjectsTab />}
+          {view === "resources" && <ResourcesTab />}
+        </main>
       </div>
-
-      <Tabs defaultValue="overview" className="mt-8">
-        <TabsList className="flex-wrap">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="responses">Survey responses</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="mt-6">
-          <OverviewTab />
-        </TabsContent>
-        <TabsContent value="responses" className="mt-6">
-          <ResponsesTab />
-        </TabsContent>
-        <TabsContent value="projects" className="mt-6">
-          <ProjectsTab />
-        </TabsContent>
-        <TabsContent value="resources" className="mt-6">
-          <ResourcesTab />
-        </TabsContent>
-      </Tabs>
-    </section>
+    </div>
   );
 }
 
-function OverviewTab() {
+function StatCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+  icon: typeof Users;
+  tone: "brand" | "success" | "warn";
+}) {
+  const toneClass = {
+    brand: "bg-brand text-brand-foreground",
+    success: "bg-success text-white",
+    warn: "bg-warn text-navy-deep",
+  }[tone];
+  return (
+    <div className={`flex items-center gap-4 rounded-2xl p-5 shadow-lg ${toneClass}`}>
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/20">
+        <Icon className="size-6" aria-hidden="true" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold opacity-90">{label}</p>
+        <p className="text-3xl font-extrabold leading-tight">{value}</p>
+        <p className="text-xs opacity-80">{hint}</p>
+      </div>
+    </div>
+  );
+}
+
+function OverviewTab({ onSeeAll }: { onSeeAll: () => void }) {
   const [aggregates, setAggregates] = useState<Awaited<ReturnType<typeof getSurveyAggregates>>["data"]>(null);
+  const [recent, setRecent] = useState<SurveyRecord[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
 
@@ -139,6 +272,9 @@ function OverviewTab() {
     getSurveyAggregates().then((result) => {
       if (result.error || !result.data) setError(result.error ?? "Could not load statistics.");
       else setAggregates(result.data);
+    });
+    listSurveyResponses().then((result) => {
+      if (result.data) setRecent(result.data.slice(0, 5));
     });
   }, []);
 
@@ -175,35 +311,114 @@ function OverviewTab() {
     );
   }
 
+  const fmt = (v: number | undefined) => (v == null ? "—" : `${Number(v).toFixed(1)} / 5`);
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          <span className="font-display text-2xl font-semibold text-foreground">
-            {aggregates.total_responses}
-          </span>{" "}
-          anonymous responses collected
-        </p>
-        <Button variant="outline" onClick={downloadCsv} disabled={exporting}>
-          {exporting ? (
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-          ) : (
-            <Download className="size-4" aria-hidden="true" />
-          )}
-          Export CSV
-        </Button>
+      <div className="grid gap-4 md:grid-cols-3">
+        <StatCard
+          label="Total responses"
+          value={String(aggregates.total_responses)}
+          hint="Anonymous submissions"
+          icon={Users}
+          tone="brand"
+        />
+        <StatCard
+          label="Physical health impact"
+          value={fmt(aggregates.mean_scores["health_impact_physical"])}
+          hint="Mean perceived score"
+          icon={HeartPulse}
+          tone="success"
+        />
+        <StatCard
+          label="Mental health impact"
+          value={fmt(aggregates.mean_scores["health_impact_mental"])}
+          hint="Mean perceived score"
+          icon={Brain}
+          tone="warn"
+        />
       </div>
 
+      <Card className="panel gap-0 py-0">
+        <CardContent className="p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-lg font-bold text-navy">Responses over time</h3>
+            <Button variant="outline" onClick={downloadCsv} disabled={exporting} className="rounded-full">
+              {exporting ? (
+                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Download className="size-4" aria-hidden="true" />
+              )}
+              Export CSV
+            </Button>
+          </div>
+          {aggregates.responses_by_month?.length ? (
+            <ResponsesOverTimeChart
+              data={aggregates.responses_by_month.map((m) => ({ month: m.month, responses: m.n }))}
+            />
+          ) : (
+            <p className="py-10 text-center text-sm text-muted-foreground">
+              No responses yet — the trend appears once the survey is submitted.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="panel gap-0 py-0">
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between px-6 pt-6">
+            <h3 className="text-lg font-bold text-navy">Recent responses</h3>
+            <button
+              type="button"
+              onClick={onSeeAll}
+              className="text-sm font-bold text-brand hover:text-brand-deep"
+            >
+              View all
+            </button>
+          </div>
+          {recent.length === 0 ? (
+            <p className="px-6 py-8 text-sm text-muted-foreground">No survey responses yet.</p>
+          ) : (
+            <div className="overflow-x-auto px-2 pb-3 pt-2">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Age</TableHead>
+                    <TableHead>Awareness</TableHead>
+                    <TableHead>Physical</TableHead>
+                    <TableHead>Mental</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recent.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className="whitespace-nowrap text-xs">
+                        {new Date(row.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{row.age_range}</TableCell>
+                      <TableCell className="text-xs">{VALUE_LABELS[row.awareness_level ?? ""] ?? "—"}</TableCell>
+                      <TableCell>{row.health_impact_physical ?? "—"}</TableCell>
+                      <TableCell>{row.health_impact_mental ?? "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="rounded-2xl border-border/60 shadow-sm">
+        <Card className="panel gap-0 py-0">
           <CardContent className="p-6">
-            <h3 className="font-display text-lg font-semibold">Respondents by age group</h3>
+            <h3 className="text-lg font-bold text-navy">Respondents by age group</h3>
             <AgeDistributionChart data={sliceData(aggregates.by_age_range)} />
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-border/60 shadow-sm">
+        <Card className="panel gap-0 py-0">
           <CardContent className="p-6">
-            <h3 className="font-display text-lg font-semibold">Mean perceived impact</h3>
+            <h3 className="text-lg font-bold text-navy">Mean perceived impact</h3>
             <ImpactScoresChart
               data={IMPACT_KEYS.filter(({ key }) => aggregates.mean_scores[key] != null).map(
                 ({ key, label }) => ({ label, value: Number(aggregates.mean_scores[key]) }),
@@ -211,15 +426,15 @@ function OverviewTab() {
             />
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-border/60 shadow-sm">
+        <Card className="panel gap-0 py-0">
           <CardContent className="p-6">
-            <h3 className="font-display text-lg font-semibold">Observed effects</h3>
+            <h3 className="text-lg font-bold text-navy">Observed effects</h3>
             <CategoryBarsChart data={sliceData(aggregates.observed_effects, EFFECT_LABELS)} />
           </CardContent>
         </Card>
-        <Card className="rounded-2xl border-border/60 shadow-sm">
+        <Card className="panel gap-0 py-0">
           <CardContent className="p-6">
-            <h3 className="font-display text-lg font-semibold">Awareness levels</h3>
+            <h3 className="text-lg font-bold text-navy">Awareness levels</h3>
             <CategoryBarsChart
               data={sliceData(aggregates.awareness_distribution, VALUE_LABELS)}
             />
@@ -255,7 +470,7 @@ function ResponsesTab() {
     return (
       <p className="rounded-xl border border-border/60 bg-secondary/50 px-4 py-6 text-center text-sm text-muted-foreground">
         No survey responses yet. Share the{" "}
-        <Link to="/survey" className="font-semibold text-teal-deep underline underline-offset-4">
+        <Link to="/survey" className="font-semibold text-brand-deep underline underline-offset-4">
           survey link
         </Link>{" "}
         to start collecting.
@@ -264,7 +479,7 @@ function ResponsesTab() {
   }
 
   return (
-    <Card className="rounded-2xl border-border/60 shadow-sm">
+    <Card className="panel gap-0 py-0">
       <CardContent className="p-0">
         <div className="max-h-[70vh] overflow-auto rounded-2xl">
           <Table>
@@ -345,9 +560,9 @@ function ProjectsTab() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-      <Card className="rounded-2xl border-border/60 shadow-sm">
+      <Card className="panel gap-0 py-0">
         <CardContent className="p-6">
-          <h3 className="font-display text-lg font-semibold">Add a research project</h3>
+          <h3 className="text-lg font-bold text-navy">Add a research project</h3>
           <form className="mt-4 space-y-4" onSubmit={handleSave}>
             <div className="space-y-1.5">
               <Label htmlFor="project-title">Title</Label>
@@ -373,7 +588,7 @@ function ProjectsTab() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" disabled={saving} className="bg-teal text-teal-foreground hover:bg-teal-deep">
+            <Button type="submit" disabled={saving} className="bg-brand text-brand-foreground hover:bg-brand-deep">
               {saving ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
               Save project
             </Button>
@@ -381,9 +596,9 @@ function ProjectsTab() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-border/60 shadow-sm">
+      <Card className="panel gap-0 py-0">
         <CardContent className="p-6">
-          <h3 className="font-display text-lg font-semibold">Existing projects</h3>
+          <h3 className="text-lg font-bold text-navy">Existing projects</h3>
           {!projects ? (
             <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Loading…
@@ -462,9 +677,9 @@ function ResourcesTab() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-      <Card className="rounded-2xl border-border/60 shadow-sm">
+      <Card className="panel gap-0 py-0">
         <CardContent className="p-6">
-          <h3 className="font-display text-lg font-semibold">Add a support resource</h3>
+          <h3 className="text-lg font-bold text-navy">Add a support resource</h3>
           <form className="mt-4 space-y-4" onSubmit={handleSave}>
             <div className="space-y-1.5">
               <Label htmlFor="resource-title">Title</Label>
@@ -514,7 +729,7 @@ function ResourcesTab() {
                 onChange={(e) => setSourceUrl(e.target.value)}
               />
             </div>
-            <Button type="submit" disabled={saving} className="bg-teal text-teal-foreground hover:bg-teal-deep">
+            <Button type="submit" disabled={saving} className="bg-brand text-brand-foreground hover:bg-brand-deep">
               {saving ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
               Save resource
             </Button>
@@ -522,9 +737,9 @@ function ResourcesTab() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-2xl border-border/60 shadow-sm">
+      <Card className="panel gap-0 py-0">
         <CardContent className="p-6">
-          <h3 className="font-display text-lg font-semibold">All resources</h3>
+          <h3 className="text-lg font-bold text-navy">All resources</h3>
           {!resources ? (
             <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" aria-hidden="true" /> Loading…
@@ -567,7 +782,7 @@ function ResourcesTab() {
             </ul>
           )}
           <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-            <ShieldCheck className="size-3.5 text-teal-deep" aria-hidden="true" />
+            <ShieldCheck className="size-3.5 text-brand-deep" aria-hidden="true" />
             Published resources appear on the public Prevention &amp; Resources page.
           </p>
         </CardContent>

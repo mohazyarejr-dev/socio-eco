@@ -5,9 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Youth Wellbeing Research — design system.
- * Palette: deep navy (trust, research authority), teal (health & vitality),
- * warm white and light grey surfaces. Display serif: Fraunces. Body: Public Sans.
+ * Youth Health Matters — design system.
+ * Palette: deep navy (trust, authority) and vivid blue (action, clarity) on
+ * cool white surfaces, with green and amber reserved for status and dashboards.
+ * One typeface: Plus Jakarta Sans — geometric, friendly, highly legible.
  */
 
 @theme inline {
@@ -42,87 +43,96 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-teal: var(--teal);
-  --color-teal-deep: var(--teal-deep);
-  --color-teal-foreground: var(--teal-foreground);
-  --color-teal-soft: var(--teal-soft);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-soft: var(--brand-soft);
   --color-navy: var(--navy);
   --color-navy-deep: var(--navy-deep);
   --color-navy-soft: var(--navy-soft);
   --color-navy-foreground: var(--navy-foreground);
-  --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --color-success: var(--success);
+  --color-warn: var(--warn);
+  --color-sky: var(--sky);
 }
 
 :root {
-  --radius: 0.75rem;
-  --background: oklch(0.993 0.003 240);
-  --foreground: oklch(0.24 0.05 258);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.05 258);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.05 258);
-  --primary: oklch(0.32 0.07 256);
-  --primary-foreground: oklch(0.985 0.005 240);
-  --secondary: oklch(0.955 0.012 240);
-  --secondary-foreground: oklch(0.3 0.06 256);
-  --muted: oklch(0.957 0.008 240);
-  --muted-foreground: oklch(0.5 0.032 255);
-  --accent: oklch(0.94 0.035 195);
-  --accent-foreground: oklch(0.32 0.06 220);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0.005 240);
-  --border: oklch(0.917 0.014 242);
-  --input: oklch(0.917 0.014 242);
-  --ring: oklch(0.62 0.1 195);
-  --teal: oklch(0.7 0.115 192);
-  --teal-deep: oklch(0.5 0.1 200);
-  --teal-foreground: oklch(0.99 0.005 190);
-  --teal-soft: oklch(0.94 0.035 195);
-  --navy: oklch(0.32 0.07 256);
-  --navy-deep: oklch(0.23 0.055 258);
-  --navy-soft: oklch(0.42 0.06 252);
-  --navy-foreground: oklch(0.985 0.005 240);
-  --chart-1: oklch(0.7 0.115 192);
-  --chart-2: oklch(0.4 0.08 252);
-  --chart-3: oklch(0.62 0.09 210);
-  --chart-4: oklch(0.78 0.08 85);
-  --chart-5: oklch(0.55 0.12 165);
+  --radius: 0.875rem;
+  --background: #f6f9fe;
+  --foreground: #0b1f44;
+  --card: #ffffff;
+  --card-foreground: #0b1f44;
+  --popover: #ffffff;
+  --popover-foreground: #0b1f44;
+  --primary: #0b2a5b;
+  --primary-foreground: #f7faff;
+  --secondary: #eaf1fd;
+  --secondary-foreground: #0b2a5b;
+  --muted: #eef3fb;
+  --muted-foreground: #55688a;
+  --accent: #e3edff;
+  --accent-foreground: #0b2a5b;
+  --destructive: #d9363e;
+  --destructive-foreground: #ffffff;
+  --border: #dfe7f5;
+  --input: #d3ddf0;
+  --ring: #1565ff;
+  --brand: #1565ff;
+  --brand-deep: #0b4fd6;
+  --brand-foreground: #ffffff;
+  --brand-soft: #e6efff;
+  --navy: #0b2a5b;
+  --navy-deep: #061a3b;
+  --navy-soft: #16408a;
+  --navy-foreground: #f7faff;
+  --sky: #7db8ff;
+  --success: #1f9d63;
+  --warn: #f5a524;
+  --chart-1: #1565ff;
+  --chart-2: #0b2a5b;
+  --chart-3: #4aa3ff;
+  --chart-4: #f5a524;
+  --chart-5: #1f9d63;
 }
 
 .dark {
-  --background: oklch(0.2 0.05 258);
-  --foreground: oklch(0.98 0.005 240);
-  --card: oklch(0.26 0.055 256);
-  --card-foreground: oklch(0.98 0.005 240);
-  --popover: oklch(0.26 0.055 256);
-  --popover-foreground: oklch(0.98 0.005 240);
-  --primary: oklch(0.75 0.1 195);
-  --primary-foreground: oklch(0.22 0.05 256);
-  --secondary: oklch(0.32 0.055 254);
-  --secondary-foreground: oklch(0.98 0.005 240);
-  --muted: oklch(0.32 0.055 254);
-  --muted-foreground: oklch(0.72 0.03 250);
-  --accent: oklch(0.34 0.06 230);
-  --accent-foreground: oklch(0.98 0.005 240);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0.005 240);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.7 0.115 192);
-  --teal: oklch(0.75 0.11 192);
-  --teal-deep: oklch(0.55 0.1 200);
-  --teal-foreground: oklch(0.2 0.05 210);
-  --teal-soft: oklch(0.3 0.05 210);
-  --navy: oklch(0.26 0.055 256);
-  --navy-deep: oklch(0.2 0.05 258);
-  --navy-soft: oklch(0.36 0.055 254);
-  --navy-foreground: oklch(0.985 0.005 240);
-  --chart-1: oklch(0.75 0.11 192);
-  --chart-2: oklch(0.68 0.09 252);
-  --chart-3: oklch(0.66 0.09 210);
-  --chart-4: oklch(0.8 0.08 85);
-  --chart-5: oklch(0.62 0.12 165);
+  --background: #071634;
+  --foreground: #f1f6ff;
+  --card: #0d2552;
+  --card-foreground: #f1f6ff;
+  --popover: #0d2552;
+  --popover-foreground: #f1f6ff;
+  --primary: #6aa6ff;
+  --primary-foreground: #061a3b;
+  --secondary: #12306a;
+  --secondary-foreground: #f1f6ff;
+  --muted: #12306a;
+  --muted-foreground: #9fb4d9;
+  --accent: #173a7d;
+  --accent-foreground: #f1f6ff;
+  --destructive: #f2747b;
+  --destructive-foreground: #061a3b;
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 16%);
+  --ring: #4d8dff;
+  --brand: #3d82ff;
+  --brand-deep: #1f63e0;
+  --brand-foreground: #ffffff;
+  --brand-soft: #14346f;
+  --navy: #0d2552;
+  --navy-deep: #061a3b;
+  --navy-soft: #1a3f85;
+  --navy-foreground: #f7faff;
+  --sky: #8dc2ff;
+  --success: #3cc185;
+  --warn: #f7b84a;
+  --chart-1: #4d8dff;
+  --chart-2: #8dc2ff;
+  --chart-3: #2f6fe0;
+  --chart-4: #f7b84a;
+  --chart-5: #3cc185;
 }
 
 @layer base {
@@ -138,34 +148,52 @@
   }
 
   h1,
-  h2 {
+  h2,
+  h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
-    background-color: color-mix(in oklab, var(--teal) 30%, transparent);
+    background-color: color-mix(in oklab, var(--brand) 30%, transparent);
   }
 }
 
-/* Dark navy-to-teal veil for photo hero sections. */
+/* Navy veil for photo heroes: heavy on the text side, lets the photo breathe on the right. */
 @utility hero-shade {
-  background: linear-gradient(
-    100deg,
-    color-mix(in oklab, var(--navy-deep) 92%, transparent) 0%,
-    color-mix(in oklab, var(--navy) 78%, transparent) 48%,
-    color-mix(in oklab, var(--teal-deep) 38%, transparent) 100%
-  );
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--navy-deep) 94%, transparent) 0%,
+      color-mix(in oklab, var(--navy-deep) 80%, transparent) 38%,
+      color-mix(in oklab, var(--navy) 38%, transparent) 72%,
+      color-mix(in oklab, var(--navy) 22%, transparent) 100%
+    ),
+    linear-gradient(
+      0deg,
+      color-mix(in oklab, var(--navy-deep) 70%, transparent) 0%,
+      transparent 45%
+    );
 }
 
 /* Section band on navy. */
 @utility band-navy {
-  background: linear-gradient(
-    160deg,
-    var(--navy-deep) 0%,
-    var(--navy) 55%,
-    var(--navy-soft) 100%
-  );
+  background:
+    radial-gradient(
+      60rem 24rem at 90% -10%,
+      color-mix(in oklab, var(--brand) 32%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 60%, var(--navy-soft) 100%);
+}
+
+/* Soft panel used for the key-effects lists and dashboard cards. */
+@utility panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--navy-deep) 6%, transparent),
+    0 12px 32px -18px color-mix(in oklab, var(--navy) 28%, transparent);
 }
 
 @utility reveal {
@@ -180,5 +208,11 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
   }
 }

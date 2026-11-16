@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { getSupabaseConfig } from "@/integrations/supabase/env";
 import { surveyFormSchema } from "./survey-schema";
 
 /**
@@ -10,8 +11,7 @@ import { surveyFormSchema } from "./survey-schema";
  * can never read individual submissions. Runs only inside handlers.
  */
 function createPublicSupabaseClient() {
-  const url = process.env["SUPABASE_URL"]!;
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
+  const { url, publishableKey: key } = getSupabaseConfig();
 
   return createClient<Database>(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },

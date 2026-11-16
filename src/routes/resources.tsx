@@ -10,13 +10,13 @@ import { preventionStrategies } from "@/lib/research-content";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Prevention & Resources | Youth Wellbeing Research" },
+      { title: "Prevention & Resources | Youth Health Matters" },
       {
         name: "description",
         content:
           "Evidence-based prevention strategies, guidance for young people and families, and verified help resources for substance abuse support.",
       },
-      { property: "og:title", content: "Prevention & Resources | Youth Wellbeing Research" },
+      { property: "og:title", content: "Prevention & Resources | Youth Health Matters" },
       {
         property: "og:description",
         content:
@@ -85,7 +85,7 @@ function ResourcesPage() {
                 <ul className="mt-4 space-y-2">
                   {section.points.map((point) => (
                     <li key={point} className="flex gap-2 text-sm leading-relaxed text-foreground/85">
-                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal" />
+                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
                       {point}
                     </li>
                   ))}
@@ -100,7 +100,7 @@ function ResourcesPage() {
       <section className="bg-secondary/50 py-14" aria-labelledby="directory-heading">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <h2 id="directory-heading" className="flex items-center gap-2 font-display text-2xl font-semibold">
-            <LifeBuoy className="size-6 text-teal-deep" aria-hidden="true" />
+            <LifeBuoy className="size-6 text-brand-deep" aria-hidden="true" />
             Verified resources directory
           </h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
@@ -140,7 +140,7 @@ function ResourcesPage() {
                       href={resource.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-teal-deep hover:underline underline-offset-4"
+                      className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand-deep hover:underline underline-offset-4"
                     >
                       Visit source
                       <ExternalLink className="size-4" aria-hidden="true" />
@@ -161,7 +161,7 @@ function ResourcesPage() {
               Survey responses guide where prevention and support are needed most.
             </p>
           </div>
-          <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+          <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
             <Link to="/survey">
               Take the Survey
               <ArrowRight className="ml-1 size-4" aria-hidden="true" />

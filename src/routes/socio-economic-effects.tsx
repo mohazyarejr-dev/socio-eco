@@ -9,7 +9,7 @@ import { socioEffectsSections } from "@/lib/research-content";
 export const Route = createFileRoute("/socio-economic-effects")({
   head: () => ({
     meta: [
-      { title: "Socio-Economic Effects | Youth Wellbeing Research" },
+      { title: "Socio-Economic Effects | Youth Health Matters" },
       {
         name: "description",
         content:
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/socio-economic-effects")({
       },
       {
         property: "og:title",
-        content: "Socio-Economic Effects | Youth Wellbeing Research",
+        content: "Socio-Economic Effects | Youth Health Matters",
       },
       {
         property: "og:description",
@@ -54,7 +54,7 @@ function SocioEffectsPage() {
                 <ul className="mt-4 space-y-2">
                   {section.points.map((point) => (
                     <li key={point} className="flex gap-2 text-sm leading-relaxed text-foreground/85">
-                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-teal" />
+                      <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-brand" />
                       {point}
                     </li>
                   ))}
@@ -64,13 +64,13 @@ function SocioEffectsPage() {
           ))}
         </div>
 
-        <div className="mt-10 flex items-start gap-3 rounded-2xl border border-teal/30 bg-teal-soft/50 p-5">
-          <Info className="mt-0.5 size-5 shrink-0 text-teal-deep" aria-hidden="true" />
+        <div className="mt-10 flex items-start gap-3 rounded-2xl border border-brand/30 bg-brand-soft/50 p-5">
+          <Info className="mt-0.5 size-5 shrink-0 text-brand-deep" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-foreground/90">
             Socio-economic effects interact with health effects: lost schooling lowers
             earnings, financial stress strains health and families, and stigma blocks
             help-seeking. Support that addresses both together works best — see our{" "}
-            <Link to="/resources" className="font-semibold text-teal-deep underline underline-offset-4">
+            <Link to="/resources" className="font-semibold text-brand-deep underline underline-offset-4">
               prevention and support resources
             </Link>
             .
@@ -84,7 +84,7 @@ function SocioEffectsPage() {
               Anonymous responses on education, work, family, and finances shape this study.
             </p>
           </div>
-          <Button asChild className="bg-teal text-teal-foreground hover:bg-teal-deep">
+          <Button asChild className="bg-brand text-brand-foreground hover:bg-brand-deep">
             <Link to="/survey">
               Take the Survey
               <ArrowRight className="ml-1 size-4" aria-hidden="true" />

@@ -12,13 +12,13 @@ import { adminCheck } from "@/lib/admin.functions";
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Researcher Sign In | Youth Wellbeing Research" },
+      { title: "Researcher Sign In | Youth Health Matters" },
       {
         name: "description",
         content:
           "Sign-in area for the research team. Survey participants do not need an account — the public survey is completely anonymous.",
       },
-      { property: "og:title", content: "Researcher Sign In | Youth Wellbeing Research" },
+      { property: "og:title", content: "Researcher Sign In | Youth Health Matters" },
       {
         property: "og:description",
         content: "Sign-in area for the research team. The public survey needs no account.",
@@ -86,15 +86,15 @@ function LoginPage() {
       <Card className="rounded-2xl border-border/60 shadow-sm">
         <CardContent className="p-8">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-teal text-teal-foreground shadow-sm">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-sm">
               <ShieldCheck className="size-5" aria-hidden="true" />
             </span>
             <div>
               <h1 className="font-display text-xl font-semibold text-foreground">
                 {mode === "signin" ? "Researcher sign in" : "Create a researcher account"}
               </h1>
-              <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-                Youth Wellbeing Research
+              <p className="text-xs text-muted-foreground">
+                Youth Health Matters
               </p>
             </div>
           </div>
@@ -128,7 +128,7 @@ function LoginPage() {
             <Button
               type="submit"
               disabled={busy}
-              className="w-full bg-teal text-teal-foreground hover:bg-teal-deep"
+              className="w-full bg-brand text-brand-foreground hover:bg-brand-deep"
             >
               {busy ? (
                 <Loader2 className="mr-1 size-4 animate-spin" aria-hidden="true" />
@@ -145,7 +145,7 @@ function LoginPage() {
             {mode === "signin" ? "New to the team? " : "Already have an account? "}
             <button
               type="button"
-              className="font-semibold text-teal-deep underline underline-offset-4"
+              className="font-semibold text-brand-deep underline underline-offset-4"
               onClick={() => {
                 setMode(mode === "signin" ? "signup" : "signin");
                 setNotice(null);
@@ -156,7 +156,7 @@ function LoginPage() {
           </p>
 
           {notice ? (
-            <p className="mt-4 rounded-lg border border-teal/40 bg-teal-soft/50 px-4 py-3 text-sm leading-relaxed text-foreground/90">
+            <p className="mt-4 rounded-lg border border-brand/40 bg-brand-soft/50 px-4 py-3 text-sm leading-relaxed text-foreground/90">
               {notice}
             </p>
           ) : null}
@@ -165,7 +165,7 @@ function LoginPage() {
 
       <p className="mt-6 text-center text-xs text-muted-foreground">
         Survey participants don't need an account — the{" "}
-        <Link to="/survey" className="font-semibold text-teal-deep underline underline-offset-4">
+        <Link to="/survey" className="font-semibold text-brand-deep underline underline-offset-4">
           public survey
         </Link>{" "}
         is anonymous.

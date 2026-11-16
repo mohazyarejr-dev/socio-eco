@@ -8,7 +8,7 @@ export function SampleBadge({ label = "Sample data" }: { label?: string }) {
   return (
     <Badge
       variant="outline"
-      className="border-dashed border-primary/40 bg-primary/5 text-[11px] font-semibold uppercase tracking-wider text-primary"
+      className="border-dashed border-primary/40 bg-primary/5 text-[11px] font-semibold text-primary"
     >
       {label}
     </Badge>

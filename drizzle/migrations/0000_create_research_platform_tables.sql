@@ -54,7 +54,7 @@ create table public.survey_responses (
   services_awareness text check (services_awareness in ('none','some','several','unsure')),
   barriers text[] default '{}',
   suggestions text check (char_length(suggestions) <= 2000),
-  anon_token text not null unique,
+  anon_token text not null,
   created_at_index timestamptz generated always as (created_at) stored
 );
 
