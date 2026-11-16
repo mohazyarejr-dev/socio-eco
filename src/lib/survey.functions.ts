@@ -53,9 +53,13 @@ export const submitSurvey = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<SubmitSurveyResult> => {
     const supabase = createPublicSupabaseClient();
 
-    const { data: inserted, error } = await supabase
+    // Anonymous visitors may INSERT but never SELECT survey rows (row-level security), so we must
+    // not ask the database to return the new row. We create the id here instead.
+    const id = crypto.randomUUID();
+    const { error } = await supabase
       .from("survey_responses")
       .insert({
+        id,
         consent: true,
         age_range: data.ageRange,
         gender: data.gender,
@@ -73,9 +77,7 @@ export const submitSurvey = createServerFn({ method: "POST" })
         barriers: data.barriers,
         suggestions: data.suggestions ? data.suggestions : null,
         anon_token: data.anonToken,
-      })
-      .select("id")
-      .single();
+      });
 
     if (error) {
       if (error.code === "23505") {
@@ -88,7 +90,7 @@ export const submitSurvey = createServerFn({ method: "POST" })
       };
     }
 
-    return { ok: true, referenceCode: inserted.id.slice(0, 8).toUpperCase() };
+    return { ok: true, referenceCode: id.slice(0, 8).toUpperCase() };
   });
 
 export interface SurveyAggregates {

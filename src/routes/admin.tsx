@@ -61,9 +61,10 @@ import { SampleBadge } from "@/components/site/sample-badge";
 export const Route = createFileRoute("/admin")({
   beforeLoad: async () => {
     const result = await adminCheck();
-    if (!result.isAdmin) {
+    if (!result.isStaff) {
       throw redirect({ to: "/login" });
     }
+    return { role: result.role };
   },
   head: () => ({
     meta: [
