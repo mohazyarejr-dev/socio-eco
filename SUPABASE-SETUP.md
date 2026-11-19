@@ -35,9 +35,14 @@ the migration file in the SQL Editor. Without a row in `user_roles`, `/admin` wi
 - `.env`, `supabase/config.toml`, `drizzle.config.ts`: Lovable project values replaced with placeholders.
 - `.gitignore`: `.env` is now ignored. If it was already committed, run `git rm --cached .env`.
 
+## Moderating survey responses (admin)
+Run `supabase/migrations/20260103000000_admin_moderate_responses.sql` once in the SQL Editor (safe to re-run).
+It adds a `status` column (approved/rejected), admin update/delete policies, and makes the public statistics ignore rejected rows.
+Then in **Dashboard -> Survey responses**, admins can **edit** a response, **reject/restore** it (rejected rows are kept but excluded from statistics and CSV export), or **delete** it permanently. Researchers see the list read-only.
+
 ## Roles
 - **Admin** (`user_roles.role = 'admin'`): everything - dashboard, survey responses, CSV export, projects, resources.
-- **Researcher** (`user_roles.role = 'moderator'`): can sign in, see the dashboard and survey responses, export CSV.
+- **Researcher** (`user_roles.role = 'moderator'`): can sign in, see the dashboard and survey responses (read-only), export CSV.
 - Run `supabase/first-admin-setup.sql` to confirm/reset your first user's password and make it admin.
   Use the commented section at the bottom of that file to approve researchers.
 

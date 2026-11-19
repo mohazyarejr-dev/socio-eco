@@ -1,6 +1,14 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import {
+  AGE_RANGES,
+  AWARENESS_LEVELS,
+  EDUCATION_LEVELS,
+  EMPLOYMENT_STATUSES,
+  GENDERS,
+  SERVICES_AWARENESS,
+} from "@/lib/survey-schema";
 
 /**
  * Admin server functions. Every handler verifies the caller's role through the
@@ -46,9 +54,12 @@ export const adminCheck = createServerFn({ method: "GET" })
     };
   });
 
+export type ResponseStatus = "approved" | "rejected";
+
 export interface SurveyRecord {
   id: string;
   created_at: string;
+  status: ResponseStatus;
   age_range: string;
   gender: string | null;
   education_level: string | null;
@@ -77,7 +88,7 @@ export const listSurveyResponses = createServerFn({ method: "GET" })
     const { data, error } = await (context.supabase as any)
       .from("survey_responses")
       .select(
-        `id, created_at, age_range, gender, education_level, employment_status,
+        `id, created_at, status, age_range, gender, education_level, employment_status,
          awareness_level, health_impact_physical, health_impact_mental,
          socioeconomic_education, socioeconomic_employment, socioeconomic_family,
          socioeconomic_finance, observed_effects, services_awareness, barriers, suggestions`,
@@ -102,6 +113,7 @@ export const exportSurveyCsv = createServerFn({ method: "GET" })
     const { data, error } = await (context.supabase as any)
       .from("survey_responses")
       .select("*")
+      .eq("status", "approved")
       .order("created_at", { ascending: false });
     if (error) {
       console.error("[exportSurveyCsv] failed", error);
@@ -121,6 +133,106 @@ export const exportSurveyCsv = createServerFn({ method: "GET" })
       ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),
     ];
     return { csv: lines.join("\n") };
+  });
+
+const likert = z.number().int().min(1).max(5).nullable();
+
+const responseEditInput = z.object({
+  id: z.string().uuid(),
+  age_range: z.enum(AGE_RANGES),
+  gender: z.enum(GENDERS).nullable(),
+  education_level: z.enum(EDUCATION_LEVELS).nullable(),
+  employment_status: z.enum(EMPLOYMENT_STATUSES).nullable(),
+  awareness_level: z.enum(AWARENESS_LEVELS).nullable(),
+  health_impact_physical: likert,
+  health_impact_mental: likert,
+  socioeconomic_education: likert,
+  socioeconomic_employment: likert,
+  socioeconomic_family: likert,
+  socioeconomic_finance: likert,
+  observed_effects: z.array(z.string().max(60)).max(20),
+  services_awareness: z.enum(SERVICES_AWARENESS).nullable(),
+  barriers: z.array(z.string().max(60)).max(20),
+  suggestions: z.string().max(2000).nullable(),
+});
+
+/** Admin only: correct the answers of one survey response. */
+export const updateSurveyResponse = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => responseEditInput.parse(input))
+  .handler(async ({ context, data }): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      await requireAdmin(context);
+    } catch {
+      return { ok: false, error: "Administrator access required." };
+    }
+    const { id, ...values } = data;
+    const suggestions = values.suggestions?.trim() ? values.suggestions.trim() : null;
+    const { data: updated, error } = await (context.supabase as any)
+      .from("survey_responses")
+      .update({ ...values, suggestions })
+      .eq("id", id)
+      .select("id");
+    if (error) {
+      console.error("[updateSurveyResponse] failed", error);
+      return { ok: false, error: "Could not save the changes." };
+    }
+    if (!updated || updated.length === 0) {
+      return { ok: false, error: "Response not found or you are not allowed to change it." };
+    }
+    return { ok: true };
+  });
+
+/** Admin only: reject a response (excluded from statistics and exports) or restore it. */
+export const setSurveyResponseStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), status: z.enum(["approved", "rejected"]) }).parse(input),
+  )
+  .handler(async ({ context, data }): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      await requireAdmin(context);
+    } catch {
+      return { ok: false, error: "Administrator access required." };
+    }
+    const { data: updated, error } = await (context.supabase as any)
+      .from("survey_responses")
+      .update({ status: data.status, reviewed_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .select("id");
+    if (error) {
+      console.error("[setSurveyResponseStatus] failed", error);
+      return { ok: false, error: "Could not update the response status." };
+    }
+    if (!updated || updated.length === 0) {
+      return { ok: false, error: "Response not found or you are not allowed to change it." };
+    }
+    return { ok: true };
+  });
+
+/** Admin only: permanently delete one survey response. */
+export const deleteSurveyResponse = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      await requireAdmin(context);
+    } catch {
+      return { ok: false, error: "Administrator access required." };
+    }
+    const { data: deleted, error } = await (context.supabase as any)
+      .from("survey_responses")
+      .delete()
+      .eq("id", data.id)
+      .select("id");
+    if (error) {
+      console.error("[deleteSurveyResponse] failed", error);
+      return { ok: false, error: "Could not delete the response." };
+    }
+    if (!deleted || deleted.length === 0) {
+      return { ok: false, error: "Response not found or you are not allowed to delete it." };
+    }
+    return { ok: true };
   });
 
 export interface ResearchProject {

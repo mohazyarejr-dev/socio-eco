@@ -1,22 +1,44 @@
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-    Download,
+  Ban,
+  Download,
   FileText,
   Globe,
   LayoutDashboard,
   LifeBuoy,
   Loader2,
   LogOut,
+  Pencil,
   ShieldCheck,
   Trash2,
+  Undo2,
   Users,
   HeartPulse,
   Brain,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Card,
   CardContent,
@@ -36,14 +58,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   adminCheck,
   deleteResource,
+  deleteSurveyResponse,
   exportSurveyCsv,
   listAllProjects,
   listAllResources,
   listSurveyResponses,
+  setSurveyResponseStatus,
+  updateSurveyResponse,
   upsertProject,
   upsertResource,
   type ResearchProject,
   type ResearchResource,
+  type ResponseStatus,
   type SurveyRecord,
 } from "@/lib/admin.functions";
 import {
@@ -54,7 +80,17 @@ import {
 } from "@/components/charts/survey-charts";
 import { BrandMark } from "@/components/site/brand-mark";
 import { supabase } from "@/integrations/supabase/client";
-import { VALUE_LABELS } from "@/lib/survey-schema";
+import {
+  AGE_RANGES,
+  AWARENESS_LEVELS,
+  BARRIERS,
+  EDUCATION_LEVELS,
+  EMPLOYMENT_STATUSES,
+  GENDERS,
+  OBSERVED_EFFECTS,
+  SERVICES_AWARENESS,
+  VALUE_LABELS,
+} from "@/lib/survey-schema";
 import { getSurveyAggregates } from "@/lib/survey.functions";
 import { SampleBadge } from "@/components/site/sample-badge";
 
@@ -446,16 +482,257 @@ function OverviewTab({ onSeeAll }: { onSeeAll: () => void }) {
   );
 }
 
+const NONE = "__none";
+const SCORE_OPTIONS = ["1", "2", "3", "4", "5"];
+
+function toggleIn(list: string[], value: string, on: boolean) {
+  return on ? Array.from(new Set([...list, value])) : list.filter((v) => v !== value);
+}
+
+function ChoiceField({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  options: { value: string; label: string }[];
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Select value={value ?? NONE} onValueChange={(v) => onChange(v === NONE ? null : v)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={NONE}>— Not answered —</SelectItem>
+          {options.map((o) => (
+            <SelectItem key={o.value} value={o.value}>
+              {o.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+function EditResponseDialog({
+  record,
+  onClose,
+  onSaved,
+}: {
+  record: SurveyRecord | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = useState<SurveyRecord | null>(record);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => setForm(record), [record]);
+
+  if (!form) return null;
+  const set = <K extends keyof SurveyRecord>(key: K, value: SurveyRecord[K]) =>
+    setForm((f) => (f ? { ...f, [key]: value } : f));
+  const opts = (values: readonly string[]) =>
+    values.map((v) => ({ value: v, label: VALUE_LABELS[v] ?? v }));
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form) return;
+    setSaving(true);
+    try {
+      const result = await updateSurveyResponse({
+        data: {
+          id: form.id,
+          age_range: form.age_range as (typeof AGE_RANGES)[number],
+          gender: form.gender as (typeof GENDERS)[number] | null,
+          education_level: form.education_level as (typeof EDUCATION_LEVELS)[number] | null,
+          employment_status: form.employment_status as (typeof EMPLOYMENT_STATUSES)[number] | null,
+          awareness_level: form.awareness_level as (typeof AWARENESS_LEVELS)[number] | null,
+          health_impact_physical: form.health_impact_physical,
+          health_impact_mental: form.health_impact_mental,
+          socioeconomic_education: form.socioeconomic_education,
+          socioeconomic_employment: form.socioeconomic_employment,
+          socioeconomic_family: form.socioeconomic_family,
+          socioeconomic_finance: form.socioeconomic_finance,
+          observed_effects: form.observed_effects ?? [],
+          services_awareness: form.services_awareness as (typeof SERVICES_AWARENESS)[number] | null,
+          barriers: form.barriers ?? [],
+          suggestions: form.suggestions,
+        },
+      });
+      if (result.ok) {
+        toast.success("Response updated");
+        onSaved();
+      } else {
+        toast.error(result.error ?? "Save failed");
+      }
+    } catch {
+      toast.error("Save failed. Please check the values and try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Dialog open={!!record} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Edit survey response</DialogTitle>
+          <DialogDescription>
+            Submitted {new Date(form.created_at).toLocaleString()} · ID {form.id.slice(0, 8).toUpperCase()}.
+            Edits are saved straight to the database.
+          </DialogDescription>
+        </DialogHeader>
+        <form className="space-y-5" onSubmit={handleSave}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Age range</Label>
+              <Select value={form.age_range} onValueChange={(v) => set("age_range", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AGE_RANGES.map((v) => (
+                    <SelectItem key={v} value={v}>
+                      {VALUE_LABELS[v]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <ChoiceField label="Gender" value={form.gender} options={opts(GENDERS)} onChange={(v) => set("gender", v)} />
+            <ChoiceField label="Education" value={form.education_level} options={opts(EDUCATION_LEVELS)} onChange={(v) => set("education_level", v)} />
+            <ChoiceField label="Employment" value={form.employment_status} options={opts(EMPLOYMENT_STATUSES)} onChange={(v) => set("employment_status", v)} />
+            <ChoiceField label="Awareness level" value={form.awareness_level} options={opts(AWARENESS_LEVELS)} onChange={(v) => set("awareness_level", v)} />
+            <ChoiceField label="Awareness of services" value={form.services_awareness} options={opts(SERVICES_AWARENESS)} onChange={(v) => set("services_awareness", v)} />
+          </div>
+
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-semibold text-navy">Perceived impact (1 = none, 5 = severe)</legend>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {IMPACT_KEYS.map(({ key, label }) => (
+                <ChoiceField
+                  key={key}
+                  label={label}
+                  value={form[key] == null ? null : String(form[key])}
+                  options={SCORE_OPTIONS.map((n) => ({ value: n, label: n }))}
+                  onChange={(v) => set(key, v == null ? null : Number(v))}
+                />
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-semibold text-navy">Observed effects</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {OBSERVED_EFFECTS.map((o) => (
+                <label key={o.value} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={(form.observed_effects ?? []).includes(o.value)}
+                    onCheckedChange={(c) => set("observed_effects", toggleIn(form.observed_effects ?? [], o.value, c === true))}
+                  />
+                  {o.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-semibold text-navy">Barriers to support</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {BARRIERS.map((o) => (
+                <label key={o.value} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={(form.barriers ?? []).includes(o.value)}
+                    onCheckedChange={(c) => set("barriers", toggleIn(form.barriers ?? [], o.value, c === true))}
+                  />
+                  {o.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-suggestions">Suggestions</Label>
+            <Textarea
+              id="edit-suggestions"
+              maxLength={2000}
+              className="min-h-24"
+              value={form.suggestions ?? ""}
+              onChange={(e) => set("suggestions", e.target.value)}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving} className="bg-brand text-brand-foreground hover:bg-brand-deep">
+              {saving ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : null}
+              Save changes
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function ResponsesTab() {
+  const { role } = Route.useRouteContext();
+  const isAdmin = role === "admin";
   const [data, setData] = useState<SurveyRecord[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | ResponseStatus>("all");
+  const [editing, setEditing] = useState<SurveyRecord | null>(null);
+  const [deleting, setDeleting] = useState<SurveyRecord | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  async function reload() {
+    const result = await listSurveyResponses();
+    if (result.error || !result.data) setError(result.error ?? "Could not load records.");
+    else {
+      setError(null);
+      setData(result.data);
+    }
+  }
 
   useEffect(() => {
-    listSurveyResponses().then((result) => {
-      if (result.error || !result.data) setError(result.error ?? "Could not load records.");
-      else setData(result.data);
-    });
+    reload();
   }, []);
+
+  async function toggleReject(row: SurveyRecord) {
+    const next: ResponseStatus = row.status === "rejected" ? "approved" : "rejected";
+    setBusyId(row.id);
+    const result = await setSurveyResponseStatus({ data: { id: row.id, status: next } });
+    setBusyId(null);
+    if (result.ok) {
+      toast.success(next === "rejected" ? "Response rejected — excluded from statistics" : "Response restored");
+      await reload();
+    } else {
+      toast.error(result.error ?? "Update failed");
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleting) return;
+    const row = deleting;
+    setBusyId(row.id);
+    const result = await deleteSurveyResponse({ data: { id: row.id } });
+    setBusyId(null);
+    setDeleting(null);
+    if (result.ok) {
+      toast.success("Response deleted");
+      await reload();
+    } else {
+      toast.error(result.error ?? "Delete failed");
+    }
+  }
 
   if (error) {
     return <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>;
@@ -479,49 +756,161 @@ function ResponsesTab() {
     );
   }
 
+  const rejectedCount = data.filter((r) => r.status === "rejected").length;
+  const rows = filter === "all" ? data : data.filter((r) => r.status === filter);
+  const FILTERS: { id: "all" | ResponseStatus; label: string }[] = [
+    { id: "all", label: `All (${data.length})` },
+    { id: "approved", label: `Approved (${data.length - rejectedCount})` },
+    { id: "rejected", label: `Rejected (${rejectedCount})` },
+  ];
+
   return (
-    <Card className="panel gap-0 py-0">
-      <CardContent className="p-0">
-        <div className="max-h-[70vh] overflow-auto rounded-2xl">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Age</TableHead>
-                <TableHead>Gender</TableHead>
-                <TableHead>Employment</TableHead>
-                <TableHead>Awareness</TableHead>
-                <TableHead>Physical</TableHead>
-                <TableHead>Mental</TableHead>
-                <TableHead>Observed effects</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell className="whitespace-nowrap text-xs">
-                    {new Date(row.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>{row.age_range}</TableCell>
-                  <TableCell className="text-xs">{VALUE_LABELS[row.gender ?? ""] ?? "—"}</TableCell>
-                  <TableCell className="text-xs">{VALUE_LABELS[row.employment_status ?? ""] ?? "—"}</TableCell>
-                  <TableCell className="text-xs">{VALUE_LABELS[row.awareness_level ?? ""] ?? "—"}</TableCell>
-                  <TableCell>{row.health_impact_physical ?? "—"}</TableCell>
-                  <TableCell>{row.health_impact_mental ?? "—"}</TableCell>
-                  <TableCell className="max-w-48 text-xs text-muted-foreground">
-                    {(row.observed_effects ?? []).map((e) => EFFECT_LABELS[e] ?? e).join(", ") || "—"}
-                  </TableCell>
-                </TableRow>
+    <>
+      <Card className="panel gap-0 py-0">
+        <CardContent className="p-0">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 pt-4">
+            <div className="flex gap-2" role="group" aria-label="Filter responses by status">
+              {FILTERS.map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFilter(f.id)}
+                  aria-pressed={filter === f.id}
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    filter === f.id ? "bg-brand text-brand-foreground" : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {f.label}
+                </button>
               ))}
-            </TableBody>
-          </Table>
-        </div>
-        <p className="border-t border-border/60 px-4 py-3 text-xs text-muted-foreground">
-          Showing the {Math.min(data.length, 2000)} most recent responses. Identifying fields are
-          never collected; the anonymous token is excluded from exports.
-        </p>
-      </CardContent>
-    </Card>
+            </div>
+            {!isAdmin && (
+              <p className="text-xs text-muted-foreground">Read-only: only administrators can edit, reject or delete.</p>
+            )}
+          </div>
+          <div className="mt-3 max-h-[70vh] overflow-auto rounded-2xl">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Age</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>Employment</TableHead>
+                  <TableHead>Awareness</TableHead>
+                  <TableHead>Physical</TableHead>
+                  <TableHead>Mental</TableHead>
+                  <TableHead>Observed effects</TableHead>
+                  {isAdmin && <TableHead className="text-right">Actions</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={isAdmin ? 10 : 9} className="py-8 text-center text-sm text-muted-foreground">
+                      No responses match this filter.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {rows.map((row) => (
+                  <TableRow key={row.id} className={row.status === "rejected" ? "opacity-60" : undefined}>
+                    <TableCell className="whitespace-nowrap text-xs">
+                      {new Date(row.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={row.status === "rejected" ? "destructive" : "outline"}>{row.status}</Badge>
+                    </TableCell>
+                    <TableCell>{row.age_range}</TableCell>
+                    <TableCell className="text-xs">{VALUE_LABELS[row.gender ?? ""] ?? "—"}</TableCell>
+                    <TableCell className="text-xs">{VALUE_LABELS[row.employment_status ?? ""] ?? "—"}</TableCell>
+                    <TableCell className="text-xs">{VALUE_LABELS[row.awareness_level ?? ""] ?? "—"}</TableCell>
+                    <TableCell>{row.health_impact_physical ?? "—"}</TableCell>
+                    <TableCell>{row.health_impact_mental ?? "—"}</TableCell>
+                    <TableCell className="max-w-48 text-xs text-muted-foreground">
+                      {(row.observed_effects ?? []).map((e) => EFFECT_LABELS[e] ?? e).join(", ") || "—"}
+                    </TableCell>
+                    {isAdmin && (
+                      <TableCell className="whitespace-nowrap text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Edit response"
+                          disabled={busyId === row.id}
+                          onClick={() => setEditing(row)}
+                        >
+                          <Pencil className="size-4" aria-hidden="true" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label={row.status === "rejected" ? "Restore response" : "Reject response"}
+                          title={row.status === "rejected" ? "Restore" : "Reject"}
+                          disabled={busyId === row.id}
+                          onClick={() => toggleReject(row)}
+                        >
+                          {row.status === "rejected" ? (
+                            <Undo2 className="size-4 text-success" aria-hidden="true" />
+                          ) : (
+                            <Ban className="size-4 text-warn" aria-hidden="true" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Delete response"
+                          disabled={busyId === row.id}
+                          onClick={() => setDeleting(row)}
+                        >
+                          <Trash2 className="size-4 text-destructive" aria-hidden="true" />
+                        </Button>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <p className="border-t border-border/60 px-4 py-3 text-xs text-muted-foreground">
+            Showing the {Math.min(data.length, 2000)} most recent responses. Rejected responses are kept but
+            excluded from statistics and CSV exports. Identifying fields are never collected; the anonymous
+            token is excluded from exports.
+          </p>
+        </CardContent>
+      </Card>
+
+      {isAdmin && (
+        <>
+          <EditResponseDialog
+            record={editing}
+            onClose={() => setEditing(null)}
+            onSaved={async () => {
+              setEditing(null);
+              await reload();
+            }}
+          />
+          <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete this response?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This permanently removes the response from the database and cannot be undone. If you only
+                  want to keep it out of the statistics, use Reject instead.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmDelete}
+                  className="bg-destructive text-white hover:bg-destructive/90"
+                >
+                  Delete permanently
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </>
+      )}
+    </>
   );
 }
 

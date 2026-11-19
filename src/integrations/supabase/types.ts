@@ -120,6 +120,8 @@ export type Database = {
           socioeconomic_employment: number | null
           socioeconomic_family: number | null
           socioeconomic_finance: number | null
+          status: string
+          reviewed_at: string | null
           suggestions: string | null
         }
         Insert: {
@@ -142,6 +144,8 @@ export type Database = {
           socioeconomic_employment?: number | null
           socioeconomic_family?: number | null
           socioeconomic_finance?: number | null
+          status?: string
+          reviewed_at?: string | null
           suggestions?: string | null
         }
         Update: {
@@ -164,6 +168,8 @@ export type Database = {
           socioeconomic_employment?: number | null
           socioeconomic_family?: number | null
           socioeconomic_finance?: number | null
+          status?: string
+          reviewed_at?: string | null
           suggestions?: string | null
         }
         Relationships: []
